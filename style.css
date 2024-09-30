@@ -1,5 +1,7 @@
 * {
     box-sizing: border-box;
+    font-family: "IBM Plex Mono", monospace;
+    touch-action: manipulation;
 }
 
 html,
@@ -75,6 +77,9 @@ body {
 
 #player {
     position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .power-screen {
@@ -89,259 +94,363 @@ body {
     background-color: #000;
 }
 
-.info {
+.info,
+.guide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.info .bg,
+.guide .bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     opacity: 1;
-    z-index: 20;
-    display: none;
-    align-items: center;
-    justify-content: center;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(7px);
+    z-index: 20;
 }
 
-.info .wrapper {
-    width: 100%;
-    max-width: 600px;
-    padding: 1rem;
-    border-radius: 1rem;
+.info .wrapper,
+.guide .wrapper {
+    width: 90%;
+    height: 90%;
+    max-height: 480px;
+    max-width: 520px;
+    padding: 0;
+    border-radius: 0.7rem;
     background-color: #fff;
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
+    overflow-y: auto;
+    position: relative;
+    z-index: 21;
 }
 
-.info .wrapper .close {
-    padding: 1rem;
-    border-radius: 0.3rem;
+.info .wrapper .close,
+.guide .wrapper .close {
+    padding: 0.7rem;
+    border-radius: 50%;
     transition: 0.2s ease;
     margin-left: auto;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: absolute;
+    top: 0.3rem;
+    right: 0.3rem;
 }
 
-.info .wrapper .close:hover {
+.info .wrapper .close:hover,
+.guide .wrapper .close:hover {
     background-color: rgba(0, 0, 0, 0.03);
 }
 
-.info .wrapper .close img {
+.info .wrapper .close img,
+.guide .wrapper .close img {
     width: 1.5rem;
     height: 1.5rem;
     opacity: 0.7;
 }
 
-.info .wrapper .content {
-    padding: 1rem;
-    margin-top: 2rem;
-    font-family: "IBM Plex Mono", monospace;
-    font-weight: 500;
-    color: #000;
+.info .wrapper .content,
+.guide .wrapper .content {
+    width: 100%;
+    padding: 3rem;
+    overflow-y: auto;
 }
 
-.info .wrapper .content .title {
-    font-size: 1.2rem;
-    color: #888;
-    margin-bottom: 0.3rem;
+.guide .wrapper .content {
+    padding: 3rem 1rem 3rem 3rem;
 }
+
+.info .wrapper .content::-webkit-scrollbar,
+.guide .wrapper .content::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.info .wrapper .content::-webkit-scrollbar-track,
+.guide .wrapper .content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+.info .wrapper .content::-webkit-scrollbar-thumb,
+.guide .wrapper .content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    width: 0.5rem;
+}
+
+.info .wrapper .content::-webkit-scrollbar-thumb:hover,
+.guide .wrapper .content::-webkit-scrollbar-thumb:hover {
+    background: #eee;
+}
+
+
+.info .wrapper .content .title {
+    font-size: 1rem;
+    color: #666;
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 0.3rem;
+}
+
 
 .info .wrapper .content .text {
     font-size: 1rem;
     color: #222;
-    margin-bottom: 2rem;
+}
+
+.info .wrapper .content .text a {
+    font-size: 1rem;
+    color: #2980b9;
+    padding: 0.7rem 1.2rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: 0.3rem;
+    font-weight: 500;
+    text-decoration: none;
+    text-align: center;
+    margin: 0.7rem 0;
+    display: block;
+    width: 100%;
+}
+
+.info .wrapper .content .text a:first-child {
+    background-color: #f39c12;
+    color: #fff;
+}
+
+.info .wrapper .content .text a:last-child {
+    background-color: #000;
+    color: #fff;
+}
+
+.info .settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    text-transform: capitalize;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.info .settings-item:last-child {
+    border: 0;
+}
+
+.info .settings-item .switch {
+    width: 3.3rem;
+    height: 2.1rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 0.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.info .settings-item .switch .k {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    background-color: #fff;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.07), 0px 2px 3px rgba(0, 0, 0, 0.03);
+}
+
+.info .checkbox {
+    display: none;
+}
+
+.info .checkbox:checked~.switch {
+    background-color: #2ecc71;
+}
+
+.info .checkbox:checked~.switch .k {
+    margin-left: auto;
+}
+
+.info .section {
+    margin: 2rem 0;
+}
+
+.info .section:first-child {
+    margin-top: 0;
+}
+
+.info .section:last-child {
+    margin-bottom: 0;
+}
+
+.guide .wrapper .content .item {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.guide .wrapper .content .item .name {
+    font-size: 0.9rem;
+    color: #888;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-right: 1.5rem;
+}
+
+.guide .wrapper .content .item .value {
+    font-size: 0.9rem;
+    color: #222;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 .control {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
+    width: 10rem;
     z-index: 19;
     display: none;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 1rem;
     border-radius: 1rem;
     background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(7px);
-}
-
-.control .button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 0.3rem;
-    background-color: transparent;
+    transition: 0.2s ease;
+    overflow: hidden;
+    flex-wrap: nowrap;
     user-select: none;
+    -webkit-user-drag: none;
 }
 
-.control .wrapper .left-buttons img,
-.control .wrapper .minimize img,
-.control .wrapper .power img {
-    width: 1.2rem;
+.control .t-1,
+.control .t-2 {
+    width: 100%;
+    height: 100%;
+    padding: 0.7rem;
+    flex-shrink: 0;
+    transition: 0.1s ease;
 }
 
-.control .wrapper .right-buttons img {
-    width: 1.5rem;
+@keyframes swipeControl {
+    0% {
+        transform: translateX(0%);
+    }
+
+    40% {
+        transform: translateX(-100%);
+    }
+
+    60% {
+        transform: translateX(-100%);
+    }
+
+    0% {
+        transform: translateX(0%);
+    }
 }
 
 .control .wrapper {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.control .wrapper:last-child {
+    margin-bottom: 0;
+}
+
+.control .wrapper .button {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: #fff;
+    border-radius: 0.3rem;
+    display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.control .wrapper .left-buttons {
-    margin-right: 1rem;
-}
-
-.control .wrapper .left-buttons .button {
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.control .wrapper .left-buttons .button:first-child {
-    margin-bottom: 1rem;
-}
-
-.control .wrapper .right-buttons {
-    border-radius: 0.3rem;
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.control .wrapper .right-buttons .button:first-child {
-    margin-bottom: 1rem;
-}
-
-.control .wrapper .video-id,
-.control .wrapper .support {
-    font-size: 0.7rem;
-    color: #000;
-    background-color: #fff;
-    width: 7rem;
-    height: 2rem;
-    line-height: 2rem;
-    margin-top: 1rem;
-    font-family: "IBM Plex Mono", monospace;
     font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-size: 1.05rem;
+    color: #000;
+    position: relative;
 }
 
-.control .wrapper .video-id {
+.control .wrapper .button .notify {
+    position: absolute;
+    top: -0.2rem;
+    right: -0.2rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    background-color: red;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    color: #fff;
+    text-align: center;
+    display: none;
+}
+
+.control .wrapper .button img {
+    width: 1.2rem;
+    height: 1.2rem;
+    -webkit-user-drag: none;
+}
+
+.control .wrapper .long-button {
+    background-color: #fff;
+    border-radius: 0.3rem;
+}
+
+.control .wrapper .long-button .button:first-child,
+.control .wrapper .middle-buttons .button:first-child {
+    margin-bottom: 0.5rem;
+}
+
+.control .wrapper .middle-buttons {
+    margin: 0 0.5rem;
+}
+
+
+.control .wrapper .power-button {
+    border-radius: 50%;
+    background-color: #d63031;
+}
+
+.control .wrapper .videoIdElement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: text;
     border: 1px solid rgba(0, 0, 0, 0.1);
     background-color: rgba(0, 0, 0, 0.3);
     color: #fff;
-    user-select: all;
+    height: 2.5rem;
+    width: 5.5rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
 }
 
-.control .wrapper .minimize,
-.control .wrapper .power {
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
-    margin: 0 0 1rem 0;
-}
-
-.control .wrapper .power {
-    margin-right: 1rem;
-}
-
-@keyframes textShadow {
-    0% {
-        text-shadow: 0.4389924193300864px 0 1px rgba(0, 30, 255, 0.5), -0.4389924193300864px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    5% {
-        text-shadow: 2.7928974010788217px 0 1px rgba(0, 30, 255, 0.5), -2.7928974010788217px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    10% {
-        text-shadow: 0.02956275843481219px 0 1px rgba(0, 30, 255, 0.5), -0.02956275843481219px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    15% {
-        text-shadow: 0.40218538552878136px 0 1px rgba(0, 30, 255, 0.5), -0.40218538552878136px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    20% {
-        text-shadow: 3.4794037899852017px 0 1px rgba(0, 30, 255, 0.5), -3.4794037899852017px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    25% {
-        text-shadow: 1.6125630401149584px 0 1px rgba(0, 30, 255, 0.5), -1.6125630401149584px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    30% {
-        text-shadow: 0.7015590085143956px 0 1px rgba(0, 30, 255, 0.5), -0.7015590085143956px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    35% {
-        text-shadow: 3.896914047650351px 0 1px rgba(0, 30, 255, 0.5), -3.896914047650351px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    40% {
-        text-shadow: 3.870905614848819px 0 1px rgba(0, 30, 255, 0.5), -3.870905614848819px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    45% {
-        text-shadow: 2.231056963361899px 0 1px rgba(0, 30, 255, 0.5), -2.231056963361899px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    50% {
-        text-shadow: 0.08084290417898504px 0 1px rgba(0, 30, 255, 0.5), -0.08084290417898504px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    55% {
-        text-shadow: 2.3758461067427543px 0 1px rgba(0, 30, 255, 0.5), -2.3758461067427543px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    60% {
-        text-shadow: 2.202193051050636px 0 1px rgba(0, 30, 255, 0.5), -2.202193051050636px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    65% {
-        text-shadow: 2.8638780614874975px 0 1px rgba(0, 30, 255, 0.5), -2.8638780614874975px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    70% {
-        text-shadow: 0.48874025155497314px 0 1px rgba(0, 30, 255, 0.5), -0.48874025155497314px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    75% {
-        text-shadow: 1.8948491305757957px 0 1px rgba(0, 30, 255, 0.5), -1.8948491305757957px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    80% {
-        text-shadow: 0.0833037308038857px 0 1px rgba(0, 30, 255, 0.5), -0.0833037308038857px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    85% {
-        text-shadow: 0.09769827255241735px 0 1px rgba(0, 30, 255, 0.5), -0.09769827255241735px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    90% {
-        text-shadow: 3.443339761481782px 0 1px rgba(0, 30, 255, 0.5), -3.443339761481782px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    95% {
-        text-shadow: 2.1841838852799786px 0 1px rgba(0, 30, 255, 0.5), -2.1841838852799786px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
-
-    100% {
-        text-shadow: 2.6208764473832513px 0 1px rgba(0, 30, 255, 0.5), -2.6208764473832513px 0 1px rgba(255, 0, 80, 0.3), 0 0 3px;
-    }
+.control .wrapper .videoIdElement .text {
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.7rem;
 }
 
 .channel-name {
@@ -353,40 +462,56 @@ body {
     text-transform: uppercase;
     text-shadow: 0px 0px 2px #000;
     z-index: 17;
-    font-family: "IBM Plex Mono", monospace;
     font-weight: 700;
-    animation: textShadow 1.9s infinite;
+    transition: 0.2s ease;
 }
 
-.title {
+.volume-steps {
     position: fixed;
-    top: 6rem;
-    left: 2rem;
-    color: #cdcfcd;
+    display: flex;
+    opacity: 0;
+    width: 100%;
+    height: 100vh;
+    align-items: flex-end;
+    justify-content: center;
+    top: 0rem;
+    left: 0;
+    z-index: 17;
+    padding-bottom: 7rem;
+    transition: 0.2s ease;
+}
+
+.volume-steps .wrapper {
+    width: 80%;
+    max-width: 600px;
+}
+
+.volume-steps .text {
+    font-size: 2rem;
+    color: #00ff22;
     text-transform: uppercase;
     text-shadow: 0px 0px 2px #000;
-    z-index: 17;
-    font-family: "IBM Plex Mono", monospace;
     font-weight: 700;
-    pointer-events: none;
-    animation: textShadow 1.9s infinite;
 }
 
-@keyframes fadeout {
-    0% {
-        opacity: 1;
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0;
-    }
+.volume-steps .steps {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 3rem;
 }
 
-@media only screen and (min-width: 800px) {
+.volume-steps .steps .step {
+    height: 100%;
+    width: 1rem;
+    margin-right: 0.2rem;
+    background-color: #00ff22;
+    box-shadow: 0px 0px 1px #000;
+}
+
+
+@media only screen and (min-width: 520px) {
 
     html,
     body {
