@@ -32,24 +32,24 @@ control.addEventListener("mouseleave", function () {
 function getChannelName(channel) {
     let name = "...";
     switch (channel) {
-        case 1: name = "Sci & Tech"; break;
-        case 2: name = "Travel"; break;
-        case 3: name = "Food"; break;
-        case 4: name = "Architecture"; break;
-        case 5: name = "Film"; break;
-        case 6: name = "Documentaries"; break;
-        case 7: name = "Comedy"; break;
-        case 8: name = "Music"; break;
-        case 9: name = "Autos"; break;
-        case 10: name = "News"; break;
-        case 11: name = "UFC"; break;
-        case 12: name = "Podcasts"; break;
-        case 13: name = "Gaming"; break;
-        case 14: name = "Literature"; break;
-        case 15: name = "Cooking"; break;
-        case 16: name = "Short Films"; break;
-        case 17: name = "Game Shows"; break;
-        case 18: name = "Cartoons"; break;
+        case 1: name = "Sci & Tech-科学技术"; break;
+        case 2: name = "Travel-旅游"; break;
+        case 3: name = "Food-美食"; break;
+        case 4: name = "Architecture-建筑"; break;
+        case 5: name = "Film-电影"; break;
+        case 6: name = "Documentaries-记录"; break;
+        case 7: name = "Comedy-喜剧"; break;
+        case 8: name = "Music-音乐"; break;
+        case 9: name = "Autos-汽车"; break;
+        case 10: name = "News-新闻"; break;
+        case 11: name = "UFC-格斗"; break;
+        case 12: name = "Podcasts-播客"; break;
+        case 13: name = "Gaming-游戏"; break;
+        case 14: name = "Literature-文艺"; break;
+        case 15: name = "Cooking-烹饪"; break;
+        case 16: name = "Short Films-短视频"; break;
+        case 17: name = "Game Shows-游戏展示"; break;
+        case 18: name = "Cartoons-卡通"; break;
     }
     return name;
 }
