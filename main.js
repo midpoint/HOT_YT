@@ -72,7 +72,7 @@ function getList() {
         }
     };
     // xhttp.open("GET", "https://ytch.xyz/list.json?t=" + Date.now());
-    xhttp.open("GET", "https://github.com/midpoint/HOT_YT/raw/refs/heads/main/list.json?t=" + Date.now());
+    xhttp.open("GET", "https://raw.githubusercontent.com/midpoint/HOT_YT/refs/heads/main/list.json?t=" + Date.now());
     xhttp.send();
 }
 
