@@ -71,7 +71,8 @@ function getList() {
             playChannel(channelNumber, false);
         }
     };
-    xhttp.open("GET", "https://ytch.xyz/list.json?t=" + Date.now());
+    // xhttp.open("GET", "https://ytch.xyz/list.json?t=" + Date.now());
+    xhttp.open("GET", "https://github.com/midpoint/HOT_YT/raw/refs/heads/main/list.json?t=" + Date.now());
     xhttp.send();
 }
 
