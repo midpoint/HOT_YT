@@ -51,7 +51,8 @@ function onYouTubeIframeAPIReady() {
                         'enablejsapi': 1,
                         'modestbranding': 1,
                         'origin': window.location.origin,
-                        'hl': 'zh'
+                        'hl': 'zh',
+                        'contextmenu': 0  // 禁用右键菜单
                     },
                     events: {
                         'onReady': onPlayerReady,
@@ -59,6 +60,12 @@ function onYouTubeIframeAPIReady() {
                         'onError': onErrorOccured,
                         'onApiChange': onApiChange
                     }
+                });
+
+                // 添加事件监听器来禁用右键菜单
+                document.getElementById('player').addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    return false;
                 });
                 
                 resizePlayer();
@@ -72,78 +79,234 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+// 启用自动翻译功能
+async function translateText(text) {
+    try {
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`);
+        const data = await response.json();
+        return data[0][0][0];
+    } catch (error) {
+        console.error('翻译出错:', error);
+        return text;
+    }
+}
+
 function onApiChange(event) {
     console.log('YouTube API状态改变');
     try {
         if (player && player.loadModule) {
             player.loadModule('captions');
-            // 增加重试次数计数
-            let retryCount = 0;
-            const maxRetries = 3;
             
-            const tryLoadCaptions = () => {
-                try {
-                    const tracks = player.getOption('captions', 'tracklist') || [];
-                    console.log('可用字幕列表:', tracks);
-                    
-                    if (tracks.length > 0) {
-                        console.log('发现字幕，尝试启用');
-                        // 查找中文字幕
-                        const zhTrack = tracks.find(t => 
-                            t.languageCode.startsWith('zh') || 
-                            t.displayName.toLowerCase().includes('chinese')
-                        );
-                        
-                        if (zhTrack) {
-                            console.log('找到中文字幕:', zhTrack);
-                            player.setOption('captions', 'track', zhTrack);
-                        } else {
-                            console.log('未找到中文字幕，使用第一个可用字幕:', tracks[0]);
-                            player.setOption('captions', 'track', tracks[0]);
-                        }
-                        
-                        // 设置字幕样式
-                        player.setOption('captions', 'displaySettings', {
-                            'backgroundColor': '#000000',
-                            'backgroundOpacity': 70,
-                            'textOpacity': 100,
-                            'fontSize': 2,
-                            'edge': 'raised'
-                        });
-                        
-                        return true; // 字幕加载成功
-                    } else {
-                        console.log('没有找到字幕，尝试启用自动字幕');
-                        player.setOption('captions', 'track', {
-                            'languageCode': 'zh',
-                            'kind': 'asr'
-                        });
-                        
-                        // 如果还没有达到最大重试次数，继续尝试
-                        if (retryCount < maxRetries) {
-                            retryCount++;
-                            console.log(`字幕加载重试 (${retryCount}/${maxRetries})...`);
-                            setTimeout(tryLoadCaptions, 2000); // 2秒后重试
-                            return false;
-                        }
-                    }
-                } catch (error) {
-                    console.error('设置字幕时出错:', error);
-                    // 如果还没有达到最大重试次数，继续尝试
-                    if (retryCount < maxRetries) {
-                        retryCount++;
-                        console.log(`字幕加载重试 (${retryCount}/${maxRetries})...`);
-                        setTimeout(tryLoadCaptions, 2000); // 2秒后重试
-                        return false;
-                    }
+            // 获取所有可用字幕
+            const tracks = player.getOption('captions', 'tracklist') || [];
+            console.log('可用字幕列表:', tracks);
+            
+            // 查找中文字幕
+            const zhTrack = tracks.find(t => 
+                t.languageCode.startsWith('zh') || 
+                t.displayName.toLowerCase().includes('chinese')
+            );
+            
+            if (zhTrack) {
+                // 如果有中文字幕，直接使用
+                console.log('使用中文字幕:', zhTrack);
+                player.setOption('captions', 'track', {'languageCode': zhTrack.languageCode});
+            } else {
+                // 如果没有中文字幕，使用第一个可用字幕
+                const firstTrack = tracks[0];
+                if (firstTrack) {
+                    console.log('使用非中文字幕:', firstTrack);
+                    player.setOption('captions', 'track', {'languageCode': firstTrack.languageCode});
+                } else {
+                    // 如果没有任何字幕，尝试启用自动字幕
+                    console.log('尝试启用自动字幕');
+                    player.setOption('captions', 'track', {
+                        'kind': 'asr',
+                        'lang': 'en'
+                    });
                 }
-            };
-            
-            // 首次尝试加载字幕
-            setTimeout(tryLoadCaptions, 1000);
+                
+                // 设置字幕样式
+                player.setOption('captions', 'displaySettings', {
+                    'backgroundColor': '#000000',
+                    'backgroundOpacity': 70,
+                    'textOpacity': 100,
+                    'fontSize': 2,
+                    'edge': 'raised'
+                });
+                
+                // 启动翻译观察器
+                setupTranslationObserver();
+            }
         }
     } catch (error) {
-        console.error('API改变事件处理出错:', error);
+        console.error('API变化处理出错:', error);
+    }
+}
+
+// 设置翻译观察器
+function setupTranslationObserver() {
+    console.log('开始设置翻译观察器');
+    
+    // 等待字幕容器加载
+    const waitForCaptionsContainer = setInterval(() => {
+        // 尝试多个可能的字幕容器选择器
+        const captionsContainer = document.querySelector('.ytp-caption-window-container, .caption-window');
+        if (captionsContainer) {
+            clearInterval(waitForCaptionsContainer);
+            console.log('找到字幕容器');
+            
+            // 创建样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .caption-translation {
+                    display: block !important;
+                    margin-top: 5px !important;
+                    background-color: rgba(0, 0, 0, 0.7) !important;
+                    padding: 2px 4px !important;
+                    color: white !important;
+                    text-align: center !important;
+                    position: relative !important;
+                    z-index: 1000 !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            const observer = new MutationObserver(async (mutations) => {
+                for (const mutation of mutations) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        for (const node of mutation.addedNodes) {
+                            // 检查节点是否包含字幕文本
+                            const subtitleText = node.textContent?.trim();
+                            if (subtitleText && 
+                                (node.classList?.contains('ytp-caption-segment') || 
+                                 node.classList?.contains('captions-text') ||
+                                 node.parentElement?.classList?.contains('ytp-caption-segment') ||
+                                 node.parentElement?.classList?.contains('captions-text'))) {
+                                
+                                console.log('检测到新字幕:', subtitleText);
+                                
+                                // 获取实际的字幕容器元素
+                                const subtitleContainer = node.classList?.contains('ytp-caption-segment') || 
+                                                        node.classList?.contains('captions-text') ? 
+                                                        node : node.parentElement;
+                                
+                                // 检查是否已经有翻译
+                                if (!subtitleContainer.querySelector('.caption-translation')) {
+                                    try {
+                                        // 检查是否是中文
+                                        const isChinese = /[\u4e00-\u9fa5]/.test(subtitleText);
+                                        if (!isChinese) {
+                                            console.log('翻译非中文字幕');
+                                            const translatedText = await translateText(subtitleText);
+                                            
+                                            if (translatedText && translatedText !== subtitleText) {
+                                                // 创建翻译元素
+                                                const translationDiv = document.createElement('div');
+                                                translationDiv.className = 'caption-translation';
+                                                translationDiv.textContent = translatedText;
+                                                
+                                                // 删除已存在的翻译
+                                                const existingTranslation = subtitleContainer.querySelector('.caption-translation');
+                                                if (existingTranslation) {
+                                                    existingTranslation.remove();
+                                                }
+                                                
+                                                // 添加新翻译
+                                                subtitleContainer.appendChild(translationDiv);
+                                                console.log('添加翻译:', translatedText);
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error('翻译过程出错:', error);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            observer.observe(captionsContainer, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+            
+            console.log('字幕翻译观察器设置完成');
+        }
+    }, 1000);
+    
+    // 30秒后如果还没找到字幕容器就停止等待
+    setTimeout(() => {
+        clearInterval(waitForCaptionsContainer);
+        console.log('等待字幕容器超时');
+    }, 30000);
+}
+
+// 翻译函数
+async function translateText(text) {
+    if (!text || !text.trim()) return '';
+    
+    try {
+        console.log('开始翻译:', text);
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dt=t&q=${encodeURIComponent(text)}`);
+        if (!response.ok) {
+            throw new Error(`翻译请求失败: ${response.status}`);
+        }
+        const data = await response.json();
+        const translatedText = data[0][0][0];
+        console.log('翻译完成:', translatedText);
+        return translatedText;
+    } catch (error) {
+        console.error('翻译出错:', error);
+        return text;
+    }
+}
+
+function onPlayerReady(event) {
+    if (!player) return;
+    
+    console.log('播放器已就绪');
+    
+    // 设置初始音量
+    if (currentVolume !== null) {
+        player.setVolume(currentVolume);
+        updateVolumeDisplay();
+    }
+    
+    // 设置静音状态
+    if (isMuted) {
+        player.mute();
+    } else {
+        player.unMute();
+    }
+    
+    // 启用字幕
+    try {
+        player.loadModule('captions');
+        console.log('字幕模块已加载');
+        
+        // 设置自动字幕
+        player.setOption('captions', 'track', {
+            'kind': 'asr',
+            'lang': 'en'
+        });
+        
+        // 设置字幕样式
+        player.setOption('captions', 'displaySettings', {
+            'backgroundColor': '#000000',
+            'backgroundOpacity': 70,
+            'textOpacity': 100,
+            'fontSize': 2,
+            'edge': 'raised'
+        });
+        
+        // 设置翻译观察器
+        setupTranslationObserver();
+        
+    } catch (error) {
+        console.error('加载字幕模块时出错:', error);
     }
 }
 
@@ -180,14 +343,18 @@ function playChannel(num, force = false) {
                 console.log('新视频可用字幕:', tracks);
                 
                 if (tracks.length > 0) {
+                    console.log('发现字幕，尝试启用');
+                    // 查找中文字幕
                     const zhTrack = tracks.find(t => 
                         t.languageCode.startsWith('zh') || 
                         t.displayName.toLowerCase().includes('chinese')
                     );
                     
                     if (zhTrack) {
+                        console.log('找到中文字幕:', zhTrack);
                         player.setOption('captions', 'track', zhTrack);
                     } else {
+                        console.log('未找到中文字幕，使用第一个可用字幕:', tracks[0]);
                         player.setOption('captions', 'track', tracks[0]);
                     }
                     return true; // 字幕加载成功
@@ -230,50 +397,69 @@ function toggleCaptions() {
     console.log('字幕状态:', captionsEnabled ? '开启' : '关闭');
     
     try {
-        if (captionsEnabled) {
-            player.loadModule('captions');
-            const tracks = player.getOption('captions', 'tracklist') || [];
-            if (tracks.length > 0) {
-                player.setOption('captions', 'track', tracks[0]);
+        if (player && player.getOptions) {
+            if (captionsEnabled) {
+                // 启用字幕
+                player.loadModule('captions');
+                setTimeout(() => {
+                    try {
+                        // 设置字幕样式
+                        player.setOption('captions', 'displaySettings', {
+                            'background': '#00000066',
+                            'backgroundOpacity': 0.8,
+                            'textOpacity': 1,
+                            'windowOpacity': 0,
+                            'fontSize': 2
+                        });
+                        
+                        // 获取可用字幕
+                        const tracks = player.getOption('captions', 'tracklist') || [];
+                        console.log('可用字幕:', tracks);
+                        
+                        if (tracks.length > 0) {
+                            // 查找中文字幕
+                            const zhTrack = tracks.find(t => 
+                                t.languageCode.startsWith('zh') || 
+                                t.displayName.toLowerCase().includes('chinese')
+                            );
+                            
+                            if (zhTrack) {
+                                console.log('使用中文字幕:', zhTrack);
+                                player.setOption('captions', 'track', zhTrack);
+                            } else {
+                                console.log('使用第一个可用字幕:', tracks[0]);
+                                player.setOption('captions', 'track', tracks[0]);
+                            }
+                        } else {
+                            // 如果没有可用字幕，尝试启用自动字幕
+                            console.log('尝试启用自动字幕');
+                            player.setOption('captions', 'track', {
+                                'languageCode': 'zh-CN',
+                                'kind': 'asr'
+                            });
+                        }
+                    } catch (error) {
+                        console.error('设置字幕时出错:', error);
+                    }
+                }, 1000); // 给一点时间让字幕模块加载
             } else {
-                player.setOption('captions', 'track', {
-                    'languageCode': 'zh',
-                    'kind': 'asr'
-                });
+                // 禁用字幕
+                player.unloadModule('captions');
             }
         } else {
-            player.unloadModule('captions');
+            console.error('播放器未就绪');
         }
         
+        // 保存设置
         localStorage.setItem('captionsEnabled', captionsEnabled);
+        
+        // 更新按钮状态
+        const captionButton = document.querySelector('.caption-button');
+        if (captionButton) {
+            captionButton.classList.toggle('active', captionsEnabled);
+        }
     } catch (error) {
         console.error('切换字幕状态时出错:', error);
-    }
-}
-
-function onPlayerReady(event) {
-    console.log('播放器已就绪');
-    initSettings();
-    
-    // 确保字幕设置被立即应用
-    try {
-        player.loadModule('captions');
-        // 启用自动字幕
-        player.setOption('captions', 'displaySettings', {
-            'background': '#00000066',
-            'backgroundOpacity': 0.8,
-            'textOpacity': 1,
-            'windowOpacity': 0,
-            'fontSize': 2
-        });
-        player.setOption('captions', 'track', {
-            'languageCode': 'zh-CN',
-            'kind': 'asr'  // 启用自动语音识别字幕
-        });
-        player.setOption('captions', 'reload', true);
-        console.log('播放器字幕设置已应用');
-    } catch (error) {
-        console.error('应用字幕设置时出错:', error);
     }
 }
 
@@ -731,35 +917,49 @@ function togglePower() {
 }
 
 function getList() {
-    return fetch('list.json')
-        .then(response => response.json())
-        .then(data => {
-            localStorage.setItem('list', JSON.stringify(data));
-            console.log('频道列表已加载:', data);
-            return data;
-        })
-        .catch(error => {
-            console.error('加载频道列表失败:', error);
-            // 尝试从localStorage获取缓存的列表
-            const cachedList = localStorage.getItem('list');
-            if (cachedList) {
-                console.log('使用缓存的频道列表');
-                return JSON.parse(cachedList);
+    return new Promise((resolve, reject) => {
+        // 尝试从localStorage获取列表
+        const cachedList = localStorage.getItem('list');
+        if (cachedList) {
+            try {
+                const list = JSON.parse(cachedList);
+                window.channelList = list;
+                console.log('从缓存加载频道列表');
+                resolve(list);
+                return;
+            } catch (error) {
+                console.error('解析缓存的频道列表失败:', error);
             }
-            return null;
-        });
+        }
+
+        // 如果没有缓存或解析失败，从文件加载
+        console.log('从文件加载频道列表');
+        fetch('list.json')
+            .then(response => response.json())
+            .then(list => {
+                window.channelList = list;
+                localStorage.setItem('list', JSON.stringify(list));
+                console.log('频道列表已加载并缓存');
+                resolve(list);
+            })
+            .catch(error => {
+                console.error('加载频道列表失败:', error);
+                reject(error);
+                return null;
+            });
+    });
 }
 
 function getVideoId(channelNum) {
     try {
-        const list = JSON.parse(localStorage.getItem('list'));
-        if (!list || !list[channelNum]) {
+        const list = window.channelList;
+        if (!list || !list[channelNum] || !list[channelNum].videos) {
             console.error('无效的频道号或频道列表未加载');
             return null;
         }
         
         // 获取频道中的第一个视频ID
-        const videos = list[channelNum];
+        const videos = list[channelNum].videos;
         if (videos && videos['1']) {
             console.log(`获取频道 ${channelNum} 的视频:`, videos['1'].id);
             return videos['1'].id;
@@ -801,25 +1001,11 @@ function switchChannel(a) {
 }
 
 function getChannelName(channel) {
-    // 确保channel是数字
-    const channelNum = parseInt(channel);
-    
-    let name = "...";
-    switch (channelNum) {
-        case 1: name = "科技 Sci & Tech"; break;
-        case 2: name = "旅游 Travel"; break;
-        case 3: name = "美食 Food"; break;
-        case 4: name = "建筑 Architecture"; break;
-        case 5: name = "电影 Film"; break;
-        case 6: name = "纪录片 Documentaries"; break;
-        case 7: name = "喜剧 Comedy"; break;
-        case 8: name = "音乐 Music"; break;
-        case 9: name = "汽车 Autos"; break;
-        case 10: name = "新闻 News"; break;
-        case 11: name = "格斗 UFC"; break;
-        case 12: name = "播客 Podcasts"; break;
+    const list = window.channelList;
+    if (list && list[channel] && list[channel].name) {
+        return list[channel].name;
     }
-    return name;
+    return `频道 ${channel}`;
 }
 
 function toggleMute() {

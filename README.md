@@ -1,3 +1,5 @@
-把油管上自己喜欢的频道做成经典电视节目
+I am not the author, the video list is a hardcoded response
 
-https://midpoint.github.io/HOT_YT/
+https://ytch.xyz/
+
+mirror https://stevemk14ebr.github.io/YTCH/
