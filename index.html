@@ -25,8 +25,6 @@
 </head>
 
 <body>
-
-
     <div id="player"></div>
     <div class="static-noise"></div>
     <div class="power-screen"></div>
@@ -75,15 +73,8 @@
 
                 <div class="section">
                     <div class="title">Contact</div>
-                    <div class="text">ytchxyz@gmail.com</div>
-                </div>
-                <div class="section">
-                    <div class="title">Support</div>
-                    <div class="text">
-                        <a href="https://www.buymeacoffee.com/hadisafa">Buy Me a Coffee</a>
-                        <a href="https://www.patreon.com/hadisafa">Patreon</a>
-                    </div>
-                </div>
+                    <div class="text">https://github.com/midpoint/HOT_YT</div>
+                </div>                
             </div>
         </div>
     </div>
@@ -96,66 +87,24 @@
         </div>
     </div>
 
-
     <div class="control">
-        <div class="t-1">
-            <div class="wrapper w">
-                <div class="button min power-button" onclick="togglePower()"><img src="icons/power.svg"></div>
-                <div class="button  min" onclick="toggleGuide()"><img src="icons/book-open.svg"><span
-                        class="notify notify-new-channel"></span></div>
-                <div class="button" onclick="toggleControl()"><img class="minimizeImg" src="icons/minimize-2.svg"></div>
-            </div>
-            <div class="wrapper w">
-                <div class="long-button">
-                    <div class="button  min" onclick="changeVolume(5)"><img src="icons/plus.svg"></div>
-                    <div class="button  min" onclick="changeVolume(-5)"><img src="icons/minus.svg"></div>
-                </div>
-                <div class="middle-buttons">
-                    <div class="button  min" onclick="toggleMute()"><img class="muteIcon" src="icons/volume-x.svg">
-                    </div>
-                    <div class="button min" onclick="toggleInfo()"><img src="icons/settings.svg"></div>
-                </div>
-                <div class="long-button">
-                    <div class="button  min" onclick="switchChannel(1)"><img src="icons/chevron-up.svg"></div>
-                    <div class="button min" onclick="switchChannel(-1)"><img src="icons/chevron-down.svg"></div>
-                </div>
-            </div>
-            <div class="wrapper">
-                <div class="videoIdElement min">
-                    <div class="text"></div>
-                </div>
-                <div class="button min" onclick="toggleFullScreen()"><img class="full-screen-icon"
-                        src="icons/maximize.svg">
-                </div>
-            </div>
+        <div class="button power-button" onclick="togglePower()"><img src="icons/power.svg"></div>
+        <div class="button" onclick="toggleGuide()"><img src="icons/book-open.svg"></div>
+        <div class="button min-button" onclick="toggleMin()"><img src="icons/minimize-2.svg"></div>
+        <div class="volume-buttons">
+            <div class="button" onclick="changeVolume(5)"><img src="icons/plus.svg"></div>
+            <div class="button" onclick="toggleMute()"><img class="muteIcon" src="icons/volume-x.svg"></div>
+            <div class="button" onclick="changeVolume(-5)"><img src="icons/minus.svg"></div>
         </div>
-        <div class="t-2">
-            <div class="wrapper">
-                <div class="button" onclick="numberInput(1)">1</div>
-                <div class="button" onclick="numberInput(2)">2</div>
-                <div class="button" onclick="numberInput(3)">3</div>
-            </div>
-            <div class="wrapper">
-                <div class="button" onclick="numberInput(4)">4</div>
-                <div class="button" onclick="numberInput(5)">5</div>
-                <div class="button" onclick="numberInput(6)">6</div>
-            </div>
-            <div class="wrapper">
-                <div class="button" onclick="numberInput(7)">7</div>
-                <div class="button" onclick="numberInput(8)">8</div>
-                <div class="button" onclick="numberInput(9)">9</div>
-            </div>
-            <div class="wrapper">
-                <div class="button" onclick="recallChannel()"><img src="icons/corner-up-left.svg"></div>
-                <div class="button" onclick="numberInput(0)">0</div>
-                <div class="button" onclick="goToChannel()"><img src="icons/corner-up-right.svg"></div>
-            </div>
+        <div class="channel-buttons">
+            <div class="button" onclick="switchChannel(1)"><img src="icons/chevron-up.svg"></div>
+            <div class="button" onclick="switchChannel(-1)"><img src="icons/chevron-down.svg"></div>
         </div>
     </div>
     <div class="channel-name"></div>
 
     <script src="main.js?v=2024.9.21.2"></script>
-
+    <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 
 </html>

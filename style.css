@@ -15,18 +15,31 @@ body {
     background-color: #000;
 }
 
+#player {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+}
+
 .static-noise {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    opacity: 1;
+    opacity: 0;
     z-index: 15;
     display: block;
     background-image: url("icons/static.gif");
     background-size: 200px 200px;
     background-repeat: repeat;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 .smpte {
@@ -35,11 +48,12 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    opacity: 1;
+    opacity: 0;
     z-index: 16;
     display: flex;
     flex-wrap: nowrap;
-    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 .smpte .bar {
@@ -75,23 +89,17 @@ body {
     background-color: rgb(16, 16, 180);
 }
 
-#player {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
 .power-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    opacity: 1;
-    z-index: 18;
-    display: none;
     background-color: #000;
+    z-index: 20;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .info,
@@ -197,260 +205,325 @@ body {
     background: #eee;
 }
 
-
-.info .wrapper .content .title {
-    font-size: 1rem;
-    color: #666;
-    background-color: rgba(0, 0, 0, 0.03);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-radius: 0.3rem;
-}
-
-
-.info .wrapper .content .text {
-    font-size: 1rem;
-    color: #222;
-}
-
-.info .wrapper .content .text a {
-    font-size: 1rem;
-    color: #2980b9;
-    padding: 0.7rem 1.2rem;
-    background-color: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    border-radius: 0.3rem;
-    font-weight: 500;
-    text-decoration: none;
-    text-align: center;
-    margin: 0.7rem 0;
-    display: block;
+.info {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-}
-
-.info .wrapper .content .text a:first-child {
-    background-color: #f39c12;
-    color: #fff;
-}
-
-.info .wrapper .content .text a:last-child {
-    background-color: #000;
-    color: #fff;
-}
-
-.info .settings-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 0;
-    text-transform: capitalize;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-}
-
-.info .settings-item:last-child {
-    border: 0;
-}
-
-.info .settings-item .switch {
-    width: 3.3rem;
-    height: 2.1rem;
-    border-radius: 2rem;
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    background-color: rgba(0, 0, 0, 0.03);
-    padding: 0.1rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.info .settings-item .switch .k {
-    width: 1.8rem;
-    height: 1.8rem;
-    border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    background-color: #fff;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.07), 0px 2px 3px rgba(0, 0, 0, 0.03);
-}
-
-.info .checkbox {
+    height: 100%;
     display: none;
+    z-index: 1000;
 }
 
-.info .checkbox:checked~.switch {
-    background-color: #2ecc71;
+.info .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
 }
 
-.info .checkbox:checked~.switch .k {
-    margin-left: auto;
+.info .wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    width: 90%;
+    max-width: 600px;
+}
+
+.info .close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.info .close:hover {
+    opacity: 1;
+}
+
+.info .close img {
+    width: 1.2rem;
+    height: 1.2rem;
+    filter: invert(1);
 }
 
 .info .section {
-    margin: 2rem 0;
-}
-
-.info .section:first-child {
-    margin-top: 0;
+    margin-bottom: 2rem;
 }
 
 .info .section:last-child {
     margin-bottom: 0;
 }
 
-.guide .wrapper .content .item {
-    margin-bottom: 0.5rem;
+.info .title {
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.info .text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.info .text a {
+    color: #4CAF50;
+    text-decoration: none;
+    margin-right: 1rem;
+    transition: color 0.2s ease;
+}
+
+.info .text a:hover {
+    color: #66BB6A;
+}
+
+.settings-item {
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
 }
 
-.guide .wrapper .content .item .name {
-    font-size: 0.9rem;
-    color: #888;
-    text-transform: uppercase;
+.settings-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-item label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
     font-weight: 500;
-    margin-right: 1.5rem;
 }
 
-.guide .wrapper .content .item .value {
-    font-size: 0.9rem;
-    color: #222;
+.settings-item .checkbox {
+    display: none;
+}
+
+.settings-item .switch {
+    width: 2.5rem;
+    height: 1.25rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.settings-item .switch .k {
+    width: 1rem;
+    height: 1rem;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.settings-item .checkbox:checked + label + .switch {
+    background: #4CAF50;
+}
+
+.settings-item .checkbox:checked + label + .switch .k {
+    left: 1.375rem;
+}
+
+.guide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.guide .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.guide .wrapper {
+    position: relative;
+    background: #111;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    min-width: 400px;
+}
+
+.guide .close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.guide .close:hover {
+    opacity: 1;
+}
+
+.guide .close img {
+    width: 24px;
+    height: 24px;
+    filter: invert(1);
+}
+
+.guide .content {
+    color: white;
+    min-width: 300px;
+}
+
+.guide .title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
     text-transform: uppercase;
-    font-weight: 700;
+}
+
+.guide .channel-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.guide .channel-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.guide .channel-item.active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.guide .channel-item .number {
+    min-width: 40px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.guide .channel-item .name {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .control {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    width: 10rem;
-    z-index: 19;
-    display: none;
-    border-radius: 1rem;
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 20;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.7rem;
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(7px);
-    transition: 0.2s ease;
+    transition: all 0.3s ease;
+}
+
+.control.minimized {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.control.minimized .button:not(.min-button),
+.control.minimized .volume-buttons,
+.control.minimized .channel-buttons {
+    width: 0;
+    padding: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.control .volume-buttons,
+.control .channel-buttons {
+    display: flex;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.control .button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
     overflow: hidden;
-    flex-wrap: nowrap;
-    user-select: none;
-    -webkit-user-drag: none;
-}
-
-.control .t-1,
-.control .t-2 {
-    width: 100%;
-    height: 100%;
-    padding: 0.7rem;
     flex-shrink: 0;
-    transition: 0.1s ease;
 }
 
-@keyframes swipeControl {
-    0% {
-        transform: translateX(0%);
-    }
-
-    40% {
-        transform: translateX(-100%);
-    }
-
-    60% {
-        transform: translateX(-100%);
-    }
-
-    0% {
-        transform: translateX(0%);
-    }
+.control .button:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.control .wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+.control .button img {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
 }
 
-.control .wrapper:last-child {
-    margin-bottom: 0;
+.control .button:hover img {
+    opacity: 1;
 }
 
-.control .wrapper .button {
-    width: 2.5rem;
-    height: 2.5rem;
-    background-color: #fff;
-    border-radius: 0.3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-size: 1.05rem;
-    color: #000;
-    position: relative;
+.control .button.active {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.control .wrapper .button .notify {
-    position: absolute;
-    top: -0.2rem;
-    right: -0.2rem;
-    width: 0.7rem;
-    height: 0.7rem;
-    background-color: red;
-    border-radius: 50%;
-    font-size: 0.7rem;
-    color: #fff;
-    text-align: center;
-    display: none;
+.control .button.active img {
+    opacity: 1;
 }
 
-.control .wrapper .button img {
-    width: 1.2rem;
-    height: 1.2rem;
-    -webkit-user-drag: none;
+.control .power-button {
+    background: rgba(255, 0, 0, 0.2);
 }
 
-.control .wrapper .long-button {
-    background-color: #fff;
-    border-radius: 0.3rem;
-}
-
-.control .wrapper .long-button .button:first-child,
-.control .wrapper .middle-buttons .button:first-child {
-    margin-bottom: 0.5rem;
-}
-
-.control .wrapper .middle-buttons {
-    margin: 0 0.5rem;
-}
-
-
-.control .wrapper .power-button {
-    border-radius: 50%;
-    background-color: #d63031;
-}
-
-.control .wrapper .videoIdElement {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: text;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    background-color: rgba(0, 0, 0, 0.3);
-    color: #fff;
-    height: 2.5rem;
-    width: 5.5rem;
-    border-radius: 0.3rem;
-    cursor: pointer;
-}
-
-.control .wrapper .videoIdElement .text {
-    width: 100%;
-    text-align: center;
-    font-weight: 500;
-    font-size: 0.7rem;
+.control .power-button:hover {
+    background: rgba(255, 0, 0, 0.3);
 }
 
 .channel-name {
@@ -468,48 +541,95 @@ body {
 
 .volume-steps {
     position: fixed;
-    display: flex;
-    opacity: 0;
-    width: 100%;
-    height: 100vh;
-    align-items: flex-end;
-    justify-content: center;
-    top: 0rem;
-    left: 0;
-    z-index: 17;
-    padding-bottom: 7rem;
-    transition: 0.2s ease;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    display: none;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 5px;
+    color: white;
+    transition: opacity 0.3s ease;
 }
 
 .volume-steps .wrapper {
-    width: 80%;
-    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .volume-steps .text {
-    font-size: 2rem;
-    color: #00ff22;
     text-transform: uppercase;
-    text-shadow: 0px 0px 2px #000;
-    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: #fff;
 }
 
 .volume-steps .steps {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    height: 3rem;
+    gap: 3px;
+    height: 20px;
 }
 
-.volume-steps .steps .step {
+.volume-steps .step {
+    width: 10px;
     height: 100%;
-    width: 1rem;
-    margin-right: 0.2rem;
-    background-color: #00ff22;
-    box-shadow: 0px 0px 1px #000;
+    background: rgba(255, 255, 255, 0.3);
+    transition: background-color 0.2s ease;
 }
 
+.volume-steps .step.active {
+    background: #00ff22;
+    box-shadow: 0 0 5px rgba(0, 255, 34, 0.5);
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 0;
+    cursor: pointer;
+}
+
+.settings-item label {
+    color: white;
+    font-size: 0.9rem;
+}
+
+.settings-item .checkbox {
+    display: none;
+}
+
+.settings-item .switch {
+    width: 2rem;
+    height: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.settings-item .switch .k {
+    width: 0.8rem;
+    height: 0.8rem;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.1rem;
+    left: 0.1rem;
+    transition: all 0.3s ease;
+}
+
+.settings-item .checkbox:checked + label + .switch {
+    background: #4CAF50;
+}
+
+.settings-item .checkbox:checked + label + .switch .k {
+    left: 1.1rem;
+}
 
 @media only screen and (min-width: 520px) {
 
