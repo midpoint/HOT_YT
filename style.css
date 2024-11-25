@@ -445,7 +445,7 @@ body {
 
 .control {
     position: fixed;
-    bottom: 2rem;
+    bottom: 5rem;
     right: 2rem;
     z-index: 20;
     display: flex;
