@@ -1,5 +1,3 @@
-I am not the author, the video list is a hardcoded response
+把油管上喜欢的频道集中在一起，使用经典的电视节目界面播放
 
-https://ytch.xyz/
-
-mirror https://stevemk14ebr.github.io/YTCH/
+https://midpoint.github.io/HOT_YT/
